@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.mapper.UserMapper">
+    <resultMap id="UserBaseResultMap" type="com.example.entity.User">
+        <id property="uid" column="uid"></id>
+        <result property="username" column="username"></result>
+        <result property="password" column="password"></result>
+    </resultMap>
+
+    <resultMap id="UserInfoBaseResultMap" type="com.example.entity.UserInfo">
+        <result property="city" column="city"></result>
+        <result property="cname" column="cname"></result>
+        <collection property="users" resultMap="UserBaseResultMap"></collection>
+    </resultMap>
+
+    <parameterMap id="User" type="com.example.entity.User"></parameterMap>
+
+    <select id="findAllUsers" resultMap="UserBaseResultMap">
+        select *
+        from user
+    </select>
+
+    <select id="findAllUserInfo" resultMap="UserInfoBaseResultMap">
+        SELECT *
+        FROM
+        USER AS u
+        LEFT JOIN company AS c
+        ON u.`company_id` = c.`cid`
+        LEFT JOIN address AS a
+        ON c.`address_id` = a.`aid`
+    </select>
+
+    <select id="findUserById" parameterType="Integer" resultMap="UserBaseResultMap">
+        SELECT *
+        FROM
+        USER
+        WHERE uid = #{uid}
+    </select>
+
+    <select id="findUserInfoById" parameterType="Integer" resultMap="UserInfoBaseResultMap">
+        SELECT *
+        FROM
+        USER AS u
+        LEFT JOIN company AS c
+        ON u.`company_id` = c.`cid`
+        LEFT JOIN address AS a
+        ON c.`address_id` = a.`aid`
+        WHERE u.`uid` = #{uid}
+    </select>
+
+    <select id="findUserInfoByUsernameAndCname" resultMap="UserInfoBaseResultMap">
+        SELECT
+        *
+        FROM
+        USER AS u
+        LEFT JOIN company AS c
+        ON u.`company_id` = c.`cid`
+        LEFT JOIN address AS a
+        ON c.`address_id` = a.`aid`
+        <where>
+            <if test="username != null">
+                u.username = #{username}
+            </if>
+            <if test="cname != null">
+                AND c.cname = #{cname}
+            </if>
+        </where>
+    </select>
+
+    <select id="findUserByName" resultMap="UserBaseResultMap">
+        SELECT uid, username, password
+        FROM
+        user
+        WHERE username = #{username}
+    </select>
+
+    <insert id="insertUser" parameterMap="User" useGeneratedKeys="true" keyProperty="id">
+        insert into
+        user (uid, username)
+        values
+        (#{uid}, #{username})
+    </insert>
+
+    <update id="updateUser" parameterMap="User">
+        update
+        user
+        set
+        username = #{username}
+        where
+        uid = #{uid}
+    </update>
+
+    <delete id="deleteUserById" parameterType="Integer">
+        delete from
+        user
+        where
+        uid = #{uid}
+    </delete>
+
+</mapper>
