@@ -13,6 +13,7 @@ public class UserControllerTest {
 
     @Test
     public void createUser() {
+        System.out.println("1");
     }
 
     @Test
